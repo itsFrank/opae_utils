@@ -167,7 +167,7 @@ namespace opaeutils {
                 }
                 
                 uint64_t* ptr = this->p_workspace;
-                return ptr + this->buffers[name].cl_offset;
+                return ptr + (this->buffers[name].cl_offset * (BYTES_PER_CL / sizeof(uint64_t)));
             }
 
             void writeCSR(int csr_id, uint64_t data){
@@ -199,40 +199,41 @@ namespace opaeutils {
     };
 
     template <typename T>
-    class CLAlignedBufferItterator {
+    class CLIterator  {
         private:
-            const size_t elem_byte_size;
-            const size_t misaligned_bytes;
-            const int elem_per_cl;
+            size_t elem_byte_size;
+            size_t misaligned_bytes;
+            int elem_per_cl;
             int cl_elem_offset;
 
-            const char* base_ptr;
+            char* base_ptr;
             char* current_ptr;
 
         public:
-            CLAlignedBufferItterator(size_t elem_byte_size, char* base_ptr) {
+            CLIterator(uint64_t* base_ptr, size_t elem_byte_size) {
                 this->elem_byte_size = elem_byte_size;
                 this->elem_per_cl = BYTES_PER_CL / elem_byte_size;
                 this->misaligned_bytes = BYTES_PER_CL - (elem_byte_size * this->elem_per_cl);
-                this->base_ptr = base_ptr;
+                this->base_ptr = (char*)base_ptr;
             }
 
             T* start() {
                 this->cl_elem_offset = 1;
                 this->current_ptr = this->base_ptr;
-                return static_cast<T*>(this->current_ptr);
+                return (T*)this->current_ptr;
             }
 
             T* next() {
-                if (this->cl_elem_offset == this->elem_per_cl) {
-                    this->current_ptr += this->misaligned_bytes;
+                if (this->misaligned_bytes != 0 && this->cl_elem_offset == this->elem_per_cl) {
+                    this->current_ptr += this->misaligned_bytes + this->elem_byte_size;
                     this->cl_elem_offset = 1;
                 } else {
                     this->current_ptr += this->elem_byte_size;
                     this->cl_elem_offset += 1;
                 }
-
-                return static_cast<T*>(this->current_ptr);
+                
+                cout << this->current_ptr << std::dec << endl;
+                return (T*)this->current_ptr;
             }
     };
 
