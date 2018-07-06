@@ -1,35 +1,4 @@
-#include <iostream>
-#include <iomanip>
-#include <cstring>
-#include <algorithm>
-#include <sys/time.h>
-#include <string>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <assert.h>
-#include <cstdlib> 
-#include <vector>
-#include <ctime> 
-#include <fstream>
-#include <bitset>
-
-#include "opae_svc_wrapper.h"
-#include "csr_mgr.h"
-
-#include "simple_cli.h"
 #include "opae_utils.h"
-
-
-#ifdef DEBUG
-#undef DEBUG
-#endif
-#define DEBUG(msg) std::cout << __FILE__ << " (" << __LINE__ << "): " << msg << std::endl;
-
-#define BYTES_PER_CL 64
-
-
-using namespace std;
 
 typedef struct {
     uint32_t src;
