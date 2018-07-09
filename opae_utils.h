@@ -232,7 +232,6 @@ namespace opaeutils {
                     this->cl_elem_offset += 1;
                 }
                 
-                cout << this->current_ptr << std::dec << endl;
                 return (T*)this->current_ptr;
             }
     };
